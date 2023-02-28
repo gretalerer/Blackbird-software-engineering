@@ -11,27 +11,101 @@ import logo from '../../assets/logo.svg';
 
 
 export default function LoginForm() {
-  const [showAlert, setShowAlert] = useState(false);
+  const [showAlert, setShowAlert] = useState(false); 
+  const [helperText, setHelperText] = useState('');  
+  const [passText, setPassText] = useState('');
   const validateForm = (event) => {
     event.preventDefault()
     const data = new FormData(event.currentTarget);
     const email = data.get('email');
     const password = data.get('password');
 
-    // Add validation code here
+    var validator = require("email-validator");
+    
 
+    function validatePassword(password) {
+      const hasMinimumLength = password.length >= 8;
+      const hasUppercaseLetter = /[A-Z]/.test(password);
+      const hasLowercaseLetter = /[a-z]/.test(password);
+      const hasNumber = /\d/.test(password);
+      const hasSpecialChar = /[!@#$%^&*.]/.test(password);
+      
+
+      if (!hasMinimumLength) {
+        setPassText('Password should be at least 8 characters long.');
+        return false;
+
+      }
+    
+      if (!hasUppercaseLetter) {
+        setPassText('Password should contain at least one uppercase letter.');
+        return false;
+      }
+    
+      if (!hasLowercaseLetter) {
+        setPassText('Password should contain at least one lowercase letter.');
+        return false;
+      }
+    
+      if (!hasNumber) {
+        setPassText('Password should contain at least one number.');
+        return false;
+      }
+    
+      if (!hasSpecialChar) {
+        setPassText('Password should contain at least one special character.');
+        return false;
+      }
+
+      setPassText('');
+      return true;
+      }
+
+      const isPasswordValid = validatePassword(password);
+      const isEmailValid = validator.validate(email);
+
+      if(!isEmailValid) {
+        setHelperText('Please enter valid Email address');
+      }
+      else {
+        setHelperText('');
+      }
+
+
+      if (isPasswordValid && isEmailValid) {
+        setHelperText('');
+        setPassText('');
+        setShowAlert('Login successful!');
+        return true;
+      } 
+      
+      else {
+        setShowAlert(false);
+        return false; 
+      } 
+    
   }
 
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
+    const isValid = validateForm(event); 
     console.log({
       email: data.get('email'),
       password: data.get('password'),
     });
-    validateForm(event);
-    setShowAlert("Login Successful");
-  };
+    if (isValid) {
+      const data = new FormData(event.currentTarget);
+      console.log({
+        email: data.get('email'),
+        password: data.get('password'),
+      });
+
+      
+      
+    }
+
+  }
 
   return (
     <>
@@ -87,7 +161,10 @@ export default function LoginForm() {
               name="email"
               autoComplete="email"
               autoFocus
+              error={helperText !== ''}
+              helperText={helperText}
             />
+            
             <TextField
               margin="normal"
               required
@@ -97,6 +174,8 @@ export default function LoginForm() {
               type="password"
               id="password"
               autoComplete="current-password"
+              error={passText !== ''}
+              helperText={passText}
             />
             <Button
               type="submit"
