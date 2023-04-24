@@ -153,7 +153,7 @@ export default function LoginForm() {
           </Typography>
           <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
             <TextField
-              margin="normal"
+              margin="normal"git
               required
               fullWidth
               id="email"
